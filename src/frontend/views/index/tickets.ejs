@@ -1,0 +1,63 @@
+<%- include("../sidebar") %>
+        <div class="flex-1">
+            <header class="flex items-center p-4 text-semibold shadow-neomorphic mx-8 mt-8 rounded-lg dark:shadow-neomorphic_dark">
+                <div class="flex flex-row w-full">
+                    <h3 id="headerTitulo" class="text-colorDark-50 text-2xl font w-10/12 dark:text-white-50">Tickets</h3>
+                    <div class="flex flex-row space-x-4 justify-end mr-6 w-2/12">
+                        <img src="/public/assets/sino.svg" alt="Sino de notificações" class="w-6 dark:grayscale dark:invert">
+                        <img src="/public/assets/ajuda.svg" alt="Símbolo de Ajuda" class="w-6 dark:grayscale dark:invert">
+                    </div>
+                </div>
+            </header>
+            
+            <div class="flex flex-col px-8 w-full justify-center">
+                <!--Content-->
+                <section class="mt-8 p-8"><p class="text-3xl dark:text-white-50">Encontrou erros em alguma tabela?</p><br><p class="text-xl dark:text-white-50">Crie um ticket ou visualize abaixo os abertos ;)</p></section>
+                <section class="flex flex-col items-center justify-center w-full">
+                    <!-- Demarcadores da Tabela -->
+                    <div class="rounded-lg shadow-neomorphic bg-white-50 my-4 w-full flex flex-row justify-around p-2 dark:shadow-neomorphic_dark dark:bg-colorDark-50 dark:text-white-50"><b>Categoria</b><b>Informações</b><b>Status</b></div>
+                    <!-- Ticket será dividido em 3 colunas (ícone, info e status) -->
+                    <% for (var i=0; i < tickets.length; i++){ %>   
+                    <div class="rounded-lg shadow-neomorphic bg-white-50 my-4 w-full flex flex-row justify-around p-4 dark:bg-colorDark-fundo dark:shadow-dark dark:text-white-50">
+                        <div class="w-1/4  flex items-center justify-center"><img src="/public/assets/creditoAzul.svg"></div>
+                        <div class="flex flex-col w-2/4 px-4">
+                            <div class="text-colorDark-50 flex flex-col justify-between dark:text-white-50">  
+                                <b>Ticket <%=tickets[i].ID_TICKET%></b>
+                                <p class="italic"><%= tickets[i].ID_TABELA %></p>
+                            </div>
+                            <p class="my-2 break-all text-colorDark-50 dark:text-white-50">
+                                <b>
+                                    Alterações: <br>
+                                </b>
+                                Database: <%= tickets[i].DATABASE %> <br>
+                                Id tabela: <%= tickets[i].TABELA %> <br>
+                                Caminho: <%= tickets[i].CAMINHO %>
+                            </p>
+                        </div>
+                        <div class="w-1/4 flex flex-col items-center justify-center">
+                            <!-- Status dos Tickets -->
+                            <% if(tickets[0].status == 1) { %>
+                            <div class="bg-status-yellow h-10 p-2 text-center rounded-3xl px-4">                
+                                <p class="text-white-50">Em Análise</p>                              
+                            </div>
+                            <% } else if(tickets[0].status == 2) { %>
+                                <div class="bg-status-green h-10 p-2 text-center rounded-3xl px-4">                              
+                                    <p class="text-white-50">Analisado</p>                                  
+                                </div>                           
+                            <% } else if(tickets[0].status == 0) { %>
+                                <div class="bg-colorDark-50 h-10 p-2 text-center rounded-3xl px-4">                               
+                                    <p class="text-white-50">Abertos</p>                                    
+                                </div>
+                            <% } %>
+                            <p class="italic text-colorDark-50 text-xs mt-2 dark:text-white-50">Solicitado em 20/04/23</p>
+                        </div>
+                    </div>                    
+                    <% } %>                   
+                </section>                
+            </div>
+        </div>
+    </div>
+    <%- include("../footer") %>
+    </body>
+    </html>  
+    

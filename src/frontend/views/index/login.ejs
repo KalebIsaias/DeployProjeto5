@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/public/assets/logoPanpediaReduzida.svg">
+    <title>Login</title>
+    <!-- Link para o arquivo de estilização-->
+    <!--link href="index.css"  rel="stylesheet"-->
+    <!-- Link para o funcionamento da biblioteca tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+      .font-montserrat {
+          font-family: 'Montserrat', sans-serif;
+      }
+  </style>
+</head>
+<body class="max-md:bg-black">
+  <div class="md:hidden flex ">
+    <div class="flex flex-col items-center justify-center h-full py-44">
+      <img src="/public/assets/logoFooterPanPedia.svg"" alt="Logo do Panpedia" class="w-36 h-36">
+      <p class="text-center text-white text-2xl font-montserrat w-[90%]">Desculpe, este site não pode ser acessado em dispositivos móveis.</p>
+    </div>
+  </div>
+  <div class="flex flex-row max-md:hidden">
+      <!-- Div contendo um retângulo azul com a logo do site -->
+      <div class="col-lg-6 min-h-screen bg-[#02042E] w-[50%] flex items-center justify-center">
+        <img class="w-[35vw]" src="public/assets/logo.svg"  id="imgLogo">
+      </div>
+      <!-- Div contendo inputs de login e senha -->
+      <div class="lg:col-span-6 min-h-screen w-[50%] flex items-center justify-center">
+
+            <div class="lg:col-span-6 min-h-screen w-[50%] flex flex-col items-center justify-center">
+              <button class="btn btn-primary items-center py-3 w-[35vw] border-[#02042E] bg-[#02042E] shadow-neomorphic rounded-md text-white text-lg mt-5" onclick="logar(0)">
+                Entrar como colaborador
+              </button>
+              <button class="btn items-center py-3 w-[35vw] border-[#02042E] border-2 rounded-md text-blue-900 text-lg mt-5" onclick="logar(1)">
+                Entrar como governança
+              </button>
+            </div>
+
+            <!-- Form para login -->
+          <form method="post" action="/fazer-login" id="formLogin">
+              <input type="hidden" id="email_user"  name="email_user" value="">
+              <input type="hidden" id="password"    name="password"   value="pan123">
+          </form>
+      </div>
+    </div>
+    <script>
+      // Declaração das variáveis
+      let email = document.getElementById('email_user');
+      let senha = document.getElementById('password');
+
+      // Função para logar
+      function logar(opcao){
+        email.value = opcao === 0 ? 'bruna@email.com' : 'rafael@email.com';
+        console.log(`(${email.value})(${senha.value})`)
+        submitLogin()
+      } 
+
+      // Função para enviar formulário
+      function submitLogin() {
+        document.getElementById('formLogin').submit();  
+      }
+    </script>
+</body>
+</html>

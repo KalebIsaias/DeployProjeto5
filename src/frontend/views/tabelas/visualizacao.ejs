@@ -1,0 +1,526 @@
+<!--Inclui a sidebar na página-->
+<%- include("../sidebar") %>
+    <!--Funções para os modais-->
+ 
+    <!--Conteúdo-->
+    <section class="flex flex-col pt-8 items-center w-full dark:bg-colorDark-fundo">
+        <!-- header -->
+          <!-- header -->
+          <header class="ml-24 pr-16">
+            <div class="flex flex-row bg-colorDark-50 p-7 rounded-xl">
+                <img src="/public/assets/iconecredito.svg" />
+                <div class="flex flex-col space-y-2 px-4">
+                    <div class="flex flex-row">
+                        <h3 id="headerTitulo" class="text-white-50 text-xl font break-all">
+                            <%= tabela[0].ID %>
+                        </h3>
+                    </div>
+                    <p id="headerDescricao" class="text-white-50 text-[14px] text-clip leading-relaxed break-words">
+                        <%= tabela[0].CONTEUDO_TABELA %>
+                    </p>
+                </div>
+                <div class="flex flex-col py-8 gap-4 px-2">
+                    <button id="btnAcesso" class="border border-1 rounded-xl text-white-50 text-[14px] py-2 w-[12vw]">Solicitar acesso</button>
+                    <button id="btnReportar" onclick="openModalInfo()"
+                    class="rounded-xl bg-status-red text-white-50 text-[14px] py-2 w-[12vw] hover:opacit">Sugerir
+                    alterações</button>
+                </div>
+                <form action="/fav/adicionar-pasta" method="post" class="flex justify-end items-start">
+                    <button type="submit" class="custom-submit">
+                        <svg class="w-6 h-6" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path class="fav stroke-white-50 stroke-2 hover:fill-white-50" fill="none" d="M19.5389 6.56911C19.5389 8.03826 18.9885 9.44939 18.0056 10.4933C15.743 12.8968 13.5484 15.4032 11.2013 17.7197C10.6633 18.243 9.80987 18.2239 9.29505 17.677L2.53294 10.4933C0.489019 8.32184 0.489019 4.81637 2.53294 2.64499C4.59695 0.452277 7.95945 0.452277 10.0234 2.64499L10.2693 2.9061L10.5149 2.64514C11.5045 1.59328 12.8523 1 14.2602 1C15.6682 1 17.0159 1.59322 18.0056 2.64499C18.9886 3.68893 19.5389 5.09998 19.5389 6.56911Z"/>
+                        </svg>
+                      </button>
+                    <input type="hidden" name="id_pasta" value="<%= idPasta %>">
+                    <input type="hidden" name="id_tabela" value="<%= tabela[0].ID %>">
+                </form>
+            </div>
+        </header>
+
+        <!--Conteúdo de Informações da Tabela-->
+        <section id="conteudoInfo" class="ml-24 pr-16">
+            <!--Botões-->
+            <div class="flex flex-row pt-4 pb-4 w-full gap-4 justify-between">
+                <div class="space-x-2">
+                    <button id="btnInfo"
+                        class="text-xl border-status-blue border-2 rounded-xl text-status-blue px-4 font-semibold shadow-neomorphic dark:shadow-neomorphic_dark">Informações</button>
+                    <button id="btnCampo"
+                        class="text-xl border-colorDark-50 border-2 rounded-xl text-colorDark-50 px-4 font-semibold shadow-neomorphic dark:bg-colorDark-fundo dark:shadow-neomorphic_dark dark:text-white-50 dark:border-white-50"
+                        onclick="closeConteudoInfo(), openConteudoCampos()">Campos</button>
+                </div>
+                <div class="flex flex-row">
+                    <img src="/public/assets/stars.svg" alt="">
+                </div>
+
+                <!--Avaliação Estrelas-->
+                <div class="flex items-center">
+
+                    <!--Definição de cada nível de avaliação-->
+                    <div x-data="
+                    {
+                        rating: 0, 
+                        hoverRating: 0,
+                        ratings: [{'amount': 1, 'label':'Péssima'}, {'amount': 2, 'label':'Ruim'}, {'amount': 3, 'label':'Ok'}, {'amount': 4, 'label':'Boa'}, {'amount': 5, 'label':'Ótima'}],
+                        rate(amount) {
+                            if (this.rating == amount) {
+                                this.rating = 0;
+                            } else {
+                                this.rating = amount;
+                            }
+                        },
+                        currentLabel() {
+                            let r = this.rating;
+                            if (this.hoverRating != this.rating) r = this.hoverRating;
+                            let i = this.ratings.findIndex(e => e.amount == r);
+                            if (i >= 0) {
+                                return this.ratings[i].label;
+                            } else {
+                                return '';
+                            }
+                        }
+                    }
+                " class="flex flex-col items-center justify-center space-y-2 rounded mx-auto dark:text-white-50">
+                        <div class="flex items-center space-x-0">
+
+                            <!--Label de acordo com a avaliação dada-->
+                            <div class="p-2">
+                                <template x-if="rating || hoverRating">
+                                    <p x-text="currentLabel()"></p>
+                                </template>
+                                <template x-if="!rating && !hoverRating">
+                                    <p>Avalie a tabela!</p>
+                                </template>
+                            </div>
+
+                            <!--Mudança na cor e estado das estrelas-->
+                            <template x-for="(star, index) in ratings" :key="index">
+                                <button @click="rate(star.amount)" @mouseover="hoverRating = star.amount"
+                                    @mouseleave="hoverRating = rating" aria-hidden="true" :title="star.label"
+                                    class="rounded-sm text-gray-200 fill-current focus:outline-none focus:shadow-outline p-1 w-12 m-0 cursor-pointer"
+                                    :class="{'text-blue-300': hoverRating >= star.amount, 'text-[#00C5FF]': rating >= star.amount && hoverRating >= star.amount}">
+                                    <svg class="w-10 transition duration-150" xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                </button>
+                            </template>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!--Bloco de Detalhes-->
+            <section
+                class="flex flex-col items-center pt-4 pb-10 px-5 mb-10 w-full border border-1 border-cinza rounded-xl dark:border-colorDark-cinzaclaro dark:shadow-dark">
+                <h5 class="text-xl font-bold border-2 border-colorDark-50 rounded-2xl px-4 dark:bg-colorDark-50 dark:text-white-50">Detalhes</h5>
+
+                <!--Item 1-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Database</h5>
+                    <p id="docDb" class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].DATABASE %>
+                    </p>
+                </div>
+
+                <!--Item 2-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Id tabela</h5>
+                    <p id="docId" class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].ID_TABELA %>
+                    </p>
+                </div>
+
+                <!--Item 3-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Caminho da tabela
+                    </h5>
+                    <p id="docCa" class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].CAMINHO %>
+                    </p>
+                </div>
+            </section>
+
+            <!--Bloco de Informações de Origem-->
+            <section
+                class="flex flex-col items-center pt-4 pb-10 px-5 mb-10 w-full border border-1 border-cinza rounded-xl dark:shadow-dark dark:border-colorDark-cinzaclaro">
+                <h5 class="text-xl font-bold border-2 border-colorDark-50 rounded-2xl px-4 dark:bg-colorDark-50 dark:text-white-50">Informações na
+                    Origem
+                </h5>
+
+                <!--Item 1-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark dark:bg">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Database da Origem
+                    </h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].DATABASE_ORIGEM %>
+                    </p>
+                </div>
+
+                <!--Item 2-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Schema da Origem</h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].SCHEMA_ORIGEM %>
+                    </p>
+                </div>
+
+
+                <!--Item 3-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Sistema da Origem
+                    </h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].SISTEMA_ORIGEM %>
+                    </p>
+                </div>
+
+                <!--Item 4-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Servidor da Origem
+                    </h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].SERVIDOR_ORIGEM %>
+                    </p>
+                </div>
+
+                <!--Item 5-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Frequência de
+                        atualização
+                    </h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].FREQUENCIA %>
+                    </p>
+                </div>
+
+                <!--Item 6-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Defasagem</h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].DEFASAGEM %>
+                    </p>
+                </div>
+
+                <!--Item 7-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Data de criação</h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].DataDeCriação %>
+                    </p>
+                </div>
+            </section>
+
+            <!--Bloco da Sustentação-->
+            <section
+                class="flex flex-col items-center pt-4 pb-10 px-5 mb-10 w-full border border-1 border-cinza rounded-xl dark:shadow-dark dark:border-colorDark-cinzaclaro">
+                <h5 class="text-xl font-bold border-2 border-colorDark-50 rounded-2xl px-4 dark:bg-colorDark-50 dark:text-white-50">Sustentação</h5>
+
+                <!--Item 1-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Engenheiro
+                        responsável
+                    </h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].ENG_INGESTAO %>
+                    </p>
+                </div>
+
+                <!--Item 2-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Mecânica</h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].MECANICA %>
+                    </p>
+                </div>
+            </section>
+
+            <!--Bloco de Responsável pelos dados-->
+            <section
+                class="flex flex-col items-center pt-4 pb-10 px-5 mb-10 w-full border border-1 border-cinza rounded-xl dark:border-colorDark-cinzaclaro dark:shadow-dark">
+                <h5 class="text-xl font-bold border-2 border-colorDark-50 rounded-2xl px-4 dark:bg-colorDark-50 dark:text-white-50">Responsável pelos
+                    dados
+                </h5>
+
+                <!--Item 1-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Conjunto de dados
+                    </h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].CONJUNTODADOS_PRODUTO %>
+                    </p>
+                </div>
+
+                <!--Item 2-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Owner</h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].OWNER %>
+                    </p>
+                </div>
+
+                <!--Item 3-->
+                <div
+                    class="grid grid-cols-3 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:dark:shadow-dark">
+                    <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">Steward</h5>
+                    <p class="text-corTexto text-lg justify-self-center dark:text-cinza">
+                        <%= tabela[0].STEWARD %>
+                    </p>
+                </div>
+            </section>
+        </section>
+
+        <!--Conteúdo de campos da tabela-->
+        <section id="conteudoCampos" class="hidden w-full ml-24 pr-16">
+            <!--Botões-->
+            <div class="flex flex-row pt-4 pb-4 w-full gap-4 justify-between">
+                <div class="space-x-2">
+                    <button id="btnInfo"
+                        class="text-xl border-colorDark-50 border-2 rounded-xl text-colorDark-50 px-4 font-semibold shadow-neomorphic dark:shadow-neomorphic_dark dark:text-white-50 dark:border-white-50"
+                        onclick="openConteudoInfo(), closeConteudoCampos()">Informações</button>
+                    <button id="btnCampo"
+                        class="text-xl border-status-blue border-2 rounded-xl text-status-blue px-4 font-semibold shadow-neomorphic dark:shadow-neomorphic_dark">Campos</button>
+                </div>
+                <img src="/public/assets/stars.svg" alt="">
+            </div>
+
+            <main>
+                <!--Tabela Campos-->
+                <div class="border border-cinza border-collapse w-full rounded-xl items-center px-5 dark:border-colorDark-cinzaclaro">
+
+                    <!--Colunas Tabela-->
+                    <div class="flex">
+                        <div
+                            class="flex flex-row text-[17px] bg-[#EBEBEB] shadow-neomorphic border font-medium rounded-2xl mt-4 w-full text-center dark:border-white dark:shadow-dark dark:bg-colorDark-fundo dark:text-white-50">
+                            <div class="w-1/5 p-2">Índice</div>
+                            <div class="w-1/5 p-2">Nome Campo</div>
+                            <div class="w-1/5 p-2">Tipo Campo</div>
+                            <div class="w-2/5 p-2">Descrição Campo</div>
+                        </div>
+                    </div>
+
+                    <% console.log(tabela[0].NOME_CAMPO) %>
+                        <% if(tabela[0].NOME_CAMPO !=null || tabela[0].TIPO_CAMPO !=null || tabela[0].DESCRICAO_CAMPO !=null){for(let i=0; i < tabela.length ;i++) { %>
+                            <div
+                                class="flex flex-row w-full text-center border border-[#F2F2F2] rounded-2xl mb-4 mt-4 py-3 shadow-neomorphic items-center dark:shadow-dark dark:border-colorDark-fundo dark:bg-colorDark-fundo dark:text-cinza">
+                                <div class="w-1/5 p-2">
+                                    <%= i %>
+                                </div>
+                                <div class="w-1/5 p-2">
+                                    <%= tabela[i].NOME_CAMPO %>
+                                </div>
+                                <div class="w-1/5 p-2">
+                                    <%= tabela[i].TIPO_CAMPO %>
+                                </div>
+                                <div class="w-2/5 p-2 text-left flex flex-row gap-14">
+                                    <p>
+                                        <%= tabela[i].DESCRICAO_CAMPO %>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <% }} else{ %>
+                                <div
+                                    class="flex flex-row w-full text-center border border-[#F2F2F2] rounded-2xl mb-4 mt-4 py-3 shadow-neomorphic items-center dark:shadow-dark dark:border-colorDark-fundo">
+                                    <div class="w-full p-2">
+                                        <h4 class="font-montserrat italic font-light text-xl leading-7 text-blue-900 dark:text-status-blue">
+                                            Não tem Resultados!</h4>
+                                    </div>
+                                </div>
+                                <% } %>
+                </div>
+            </main>
+        </section>
+        <%- include("../footer") %>
+    </section>
+
+
+    <!--Popup de confirmação-->
+    <div id="confirmacao" class="hidden flex items-center justify-center fixed w-full h-full bg-black bg-opacity-50">
+        <div class="bg-white-50 rounded-lg mx-auto my-auto p-4 w-1/2 py-4 dark:bg-colorDark-fundo">
+            <div class="flex flex-col p-4 text-center">
+                <p class="text-2xl font text-colorDark-50 dark:text-white-50">Sua solicitação foi enviada!</p>
+                <p class="text-colorDark-50 mt-4 dark:text-white-50">Você pode acompanhar o status da sua solicitação na página Tickets
+                </p>
+            </div>
+            <div class="flex flex-row justify-end">
+                <div class="bg-colorDark-50 px-4 py-2 rounded-lg hover:bg-opacity-70">
+                    <span class="text-white-50 font-bold cursor-pointer" onclick="closeModalConfirma()">Entendi</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Info-->
+    <div id="modalInfo" class="hidden bg-black bg-opacity-50 fixed w-[100%] h-[100%] flex items-center justify-center">
+        <div
+            class="flex flex-col bg-white-50 pt-4 pb-10 px-5 border border-1 rounded-xl  overflow-y-scroll h-[80%] w-[84%] dark:bg-colorDark-fundo dark:border-colorDark-fundo">
+            <header>
+                <div class="flex flex-row justify-between">
+                    <h3 class="text-[28px] font-bold rounded-2xl dark:text-white-50">Sugerir alterações em:</h3>
+                    <a href="#">
+                        <img src="/public/assets/fechar.svg" class="dark:grayscale dark:invert scale-50" onclick="closeModalInfo()">
+                    </a>
+                </div>
+
+                <!--Botões-->
+                <div class="flex flex-row pt-8 pb-12 w-full gap-4">
+                    <div id="btnInfo"
+                        class="text-xl border-status-blue border-2 rounded-xl text-status-blue px-4 font-semibold shadow-neomorphic dark:shadow-neomorphic_dark">
+                        Informações
+                    </div>
+                </div>
+            </header>
+            <!--Conteúdo-->
+            <main>
+                <!--Bloco de detalhes-->
+                <section
+                    class="flex flex-col items-center pt-4 pb-10 px-5 mb-10 w-full border border-1 border-cinza rounded-xl dark:border-colorDark-cinzaclaro">
+                    <h5 class="text-xl font-bold border-2 border-colorDark-50 rounded-2xl px-4 dark:bg-colorDark-50 dark:text-white-50">Detalhes</h5>
+
+                    <!--Item 1-->
+                    <div
+                        class="grid grid-cols-4 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                        <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">
+                            Database
+                        </h5>
+                        <input type="text" class="input text-corTexto w-[100%] text-center dark:bg-colorDark-fundo text-lg justify-self-center col-span-2 dark:text-cinza dark:text-cinza rounded-lg disabled" value="<%= tabela[0].DATABASE %>" name="inputDb" id="inputDb" disabled>                            
+                        <div class="justify-self-end mr-6">
+                            <svg class="w-8 h-8 text-[#F2F2F2]">
+                                <path class="icone fill-[#02042E] stroke-current stroke-2 hover:fill-status-blue dark:stroke-colorDark-fundo dark:hover:fill-status-blue dark:fill-[#F2F2F2]" d="M14.7302 4.9229L18.6531 1L25.5181 7.86507L21.5952 11.7879M14.7302 4.9229L1.40622 18.2468C1.14613 18.5069 1 18.8597 1 19.2275V25.5181H7.29057C7.65842 25.5181 8.01119 25.372 8.2713 25.1118L21.5952 11.7879M14.7302 4.9229L21.5952 11.7879"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!--Item 2-->
+                    <div
+                        class="grid grid-cols-4 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                        <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">
+                            Id tabela
+                        </h5>
+                        <input type="text" class="input dark:bg-colorDark-fundo w-[100%] text-center text-corTexto text-lg justify-self-center col-span-2 dark:text-cinza min-w-[200px] rounded-lg"  value="<%= tabela[0].ID_TABELA %>" name="inputId" id="inputId" disabled>
+                            
+                        <div class="justify-self-end mr-6 text-[#F2F2F2]" >
+                            <svg class="w-8 h-8 text-[#F2F2F2]">
+                                <path class="icone fill-[#02042E] stroke-current stroke-2 hover:fill-status-blue dark:stroke-colorDark-fundo dark:hover:fill-status-blue dark:fill-[#F2F2F2]" d="M14.7302 4.9229L18.6531 1L25.5181 7.86507L21.5952 11.7879M14.7302 4.9229L1.40622 18.2468C1.14613 18.5069 1 18.8597 1 19.2275V25.5181H7.29057C7.65842 25.5181 8.01119 25.372 8.2713 25.1118L21.5952 11.7879M14.7302 4.9229L21.5952 11.7879"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!--Item 3-->
+                    <div
+                        class="grid grid-cols-4 border-1 border-white-50 mt-4 pl-4 py-2 w-full shadow-neomorphic rounded-2xl dark:shadow-dark">
+                        <h5 class="text-xl font-semibold text-colorDark-50 justify-self-start dark:text-white-50">
+                            Caminho da tabela
+                        </h5>
+                        <input type="text" class="input dark:bg-colorDark-fundo w-[100%] text-center text-corTexto text-lg justify-self-center col-span-2 dark:text-cinza min-w-[200px] rounded-lg" value="<%= tabela[0].CAMINHO %>" name="inputCa" id="inputCa" disabled>
+                            
+                        <div class="justify-self-end mr-6">
+                            <svg class="w-8 h-8 text-[#F2F2F2]">
+                                <path class="icone fill-[#02042E] stroke-current stroke-2 hover:fill-status-blue dark:stroke-colorDark-fundo dark:hover:fill-status-blue dark:fill-[#F2F2F2]" d="M14.7302 4.9229L18.6531 1L25.5181 7.86507L21.5952 11.7879M14.7302 4.9229L1.40622 18.2468C1.14613 18.5069 1 18.8597 1 19.2275V25.5181H7.29057C7.65842 25.5181 8.01119 25.372 8.2713 25.1118L21.5952 11.7879M14.7302 4.9229L21.5952 11.7879"/>
+                            </svg>
+                        </div>
+                    </div>
+                </section>
+
+            <form id="formTicket" action="/tickets/criar-ticket" method="post">
+                <input type="hidden" name="formTa" id="formTa" value="<%= tabela[0].ID %>">
+                <input type="hidden" name="formDb" id="formDb" value="">
+                <input type="hidden" name="formId" id="formId" value="">
+                <input type="hidden" name="formCa" id="formCa" value="">
+            </form>
+            <!--Botão enviar-->
+            <footer class="flex flex-row justify-end">
+                <button onclick="inputToForm(), openModalConfirma(), closeModalInfo()" class="bg-status-green rounded-xl px-8 py-3 text-white-50 text-xl hover:bg-green-600">
+                    Enviar
+                </button>
+            </footer>
+        </div>
+    </div>   
+    <script>
+        // Declarações das variáveis
+        let inputDb = document.getElementById('inputDb');
+        let inputId = document.getElementById('inputId');
+        let inputCa = document.getElementById('inputCa');
+
+        let formDb = document.getElementById('formDb');
+        let formId = document.getElementById('formId');
+        let formCa = document.getElementById('formCa');
+
+        function inputToForm() {
+            formDb.value = inputDb.value;
+            formId.value = inputId.value;
+            formCa.value = inputCa.value;
+
+            console.log(`(${formTa.value})(${formDb.value})(${formId.value})(${formCa.value})`)
+            submitForm();
+        }
+
+// Ativar ao finalizar form
+        function submitForm() {
+            var form = document.getElementById("formTicket")
+            form.submit();
+        }
+
+        // Funções para abrir e fechar o modal
+        function openModalInfo() {
+            document.getElementById('modalInfo').classList.remove('hidden');
+        }
+        function closeModalInfo() {
+            document.getElementById('modalInfo').classList.add('hidden');
+        }
+        function openModalConfirma() {
+            document.getElementById('confirmacao').classList.remove('hidden');
+        }
+        function closeModalConfirma() {
+            document.getElementById('confirmacao').classList.add('hidden');
+        }
+        function openConteudoCampos() {
+            document.getElementById('conteudoCampos').classList.remove('hidden');
+        }
+        function closeConteudoCampos() {
+            document.getElementById('conteudoCampos').classList.add('hidden');
+        }
+        function openConteudoInfo() {
+            document.getElementById('conteudoInfo').classList.remove('hidden');
+        }
+        function closeConteudoInfo() {
+            document.getElementById('conteudoInfo').classList.add('hidden');
+        }
+        
+        //Conectando o icone de edição ao input
+        const icons = document.getElementsByClassName('icone');
+        const inputs = document.getElementsByClassName('input');
+
+        for (let i = 0; i < icons.length; i++) {
+            icons[i].addEventListener('click', () => {
+                inputs[i].disabled = false;
+                inputs[i].focus();
+                inputs[i].selectionStart = inputs[i].selectionEnd = inputs[i].value.length;
+            });
+            
+            inputs[i].addEventListener('blur', () =>{
+                inputs[i].disabled = true;
+            });
+        }
+
+        
+        </script>   
+    </body>
+    </html>
